@@ -1,0 +1,71 @@
+app: vjepa_drive
+nodes: 1
+tasks_per_node: 8
+cpus_per_task: 8
+mem_per_gpu: 80G
+folder: /data/chainflow-vla/outputs/vjepa2/lamp-ac-256-8f-vitl-88w
+data:
+  batch_size: 32
+  crop_size: 256
+  datasets:
+  - /data/chainflow-vla/navsim_vjepa_fpc8_camf0/train_action_xy.csv
+  dataset_fpcs:
+  - 8
+  fps: 2
+  num_workers: 4
+  patch_size: 16
+  pin_mem: true
+  persistent_workers: true
+  tubelet_size: 2
+  context_frames: 4
+  action_dim: 2
+data_aug:
+  auto_augment: false
+  horizontal_flip: false
+  motion_shift: false
+  random_resize_aspect_ratio:
+  - 1.0
+  - 1.0
+  random_resize_scale:
+  - 1.0
+  - 1.0
+  reprob: 0.0
+loss:
+  auto_steps: 4
+  loss_exp: 1.0
+  normalize_reps: true
+  reg_coeff: 0.0
+meta:
+  dtype: bfloat16
+  eval_freq: 100
+  resume_checkpoint: null
+  load_predictor: false
+  load_encoder: true
+  pretrain_checkpoint: /data/chainflow-vla/outputs/vjepa2/lamp-fpc8-256-vitl-88wopendv/latest.pt
+  context_encoder_key: target_encoder
+  save_every_freq: 10
+  seed: 239
+  use_sdpa: true
+model:
+  model_name: vit_large
+  pred_depth: 12
+  pred_embed_dim: 384
+  pred_is_frame_causal: true
+  pred_num_heads: 12
+  uniform_power: true
+  use_activation_checkpointing: true
+  use_rope: true
+  use_silu: false
+  use_pred_silu: false
+  wide_silu: true
+  freeze_encoder: true
+optimization:
+  anneal: 15
+  epochs: 50
+  final_lr: 0.0
+  final_weight_decay: 0.04
+  ipe: 300
+  lr: 0.000425
+  start_lr: 0.000075
+  warmup: 15
+  weight_decay: 0.04
