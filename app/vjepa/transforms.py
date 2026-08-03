@@ -53,6 +53,10 @@ class VideoTransform(object):
         self.random_resize_scale = random_resize_scale
         self.auto_augment = auto_augment
         self.motion_shift = motion_shift
+        if isinstance(crop_size, list):
+            crop_size = tuple(crop_size)
+        elif not isinstance(crop_size, tuple):
+            crop_size = (crop_size, crop_size)
         self.crop_size = crop_size
         self.mean = torch.tensor(normalize[0], dtype=torch.float32)
         self.std = torch.tensor(normalize[1], dtype=torch.float32)
@@ -62,7 +66,7 @@ class VideoTransform(object):
             self.std *= 255.0
 
         self.autoaug_transform = video_transforms.create_random_augment(
-            input_size=(crop_size, crop_size),
+            input_size=self.crop_size,
             # auto_augment="rand-m4-n4-w1-mstd0.5-inc1",
             auto_augment="rand-m7-n4-mstd0.5-inc1",
             interpolation="bicubic",
@@ -99,8 +103,8 @@ class VideoTransform(object):
 
         buffer = self.spatial_transform(
             images=buffer,
-            target_height=self.crop_size,
-            target_width=self.crop_size,
+            target_height=self.crop_size[0],
+            target_width=self.crop_size[1],
             scale=self.random_resize_scale,
             ratio=self.random_resize_aspect_ratio,
         )

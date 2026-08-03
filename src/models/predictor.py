@@ -233,11 +233,30 @@ class VisionTransformerPredictor(nn.Module):
             x = torch.cat([x_cls, x], dim=1)
 
         # Fwd prop
+        T = self.grid_depth
+        H_patches = self.grid_height
+        W_patches = self.grid_width
         for i, blk in enumerate(self.predictor_blocks):
             if self.use_activation_checkpointing:
-                x = torch.utils.checkpoint.checkpoint(blk, x, masks, None, use_reentrant=False)
+                x = torch.utils.checkpoint.checkpoint(
+                    blk,
+                    x,
+                    masks,
+                    None,
+                    T=T,
+                    H_patches=H_patches,
+                    W_patches=W_patches,
+                    use_reentrant=False,
+                )
             else:
-                x = blk(x, mask=masks, attn_mask=None)
+                x = blk(
+                    x,
+                    mask=masks,
+                    attn_mask=None,
+                    T=T,
+                    H_patches=H_patches,
+                    W_patches=W_patches,
+                )
         x = self.predictor_norm(x)
 
         if has_cls:

@@ -22,6 +22,7 @@ import time
 
 import numpy as np
 import torch
+import torch.distributed as dist
 import torch.multiprocessing as mp
 import torch.nn.functional as F
 from torch.nn.parallel import DistributedDataParallel
@@ -119,6 +120,7 @@ def main(args, resume_preempt=False):
     cfgs_data_aug = args.get("data_aug")
     ar_range = cfgs_data_aug.get("random_resize_aspect_ratio", [3 / 4, 4 / 3])
     rr_scale = cfgs_data_aug.get("random_resize_scale", [0.3, 1.0])
+    random_horizontal_flip = cfgs_data_aug.get("random_horizontal_flip", True)
     motion_shift = cfgs_data_aug.get("motion_shift", False)
     reprob = cfgs_data_aug.get("reprob", 0.0)
     use_aa = cfgs_data_aug.get("auto_augment", False)
@@ -236,7 +238,7 @@ def main(args, resume_preempt=False):
         tubelet_size=tubelet_size,
     )
     transform = make_transforms(
-        random_horizontal_flip=True,
+        random_horizontal_flip=random_horizontal_flip,
         random_resize_aspect_ratio=ar_range,
         random_resize_scale=rr_scale,
         reprob=reprob,

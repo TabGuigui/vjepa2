@@ -103,26 +103,45 @@ def load_checkpoint(
     if not is_anneal:
         epoch = checkpoint["epoch"]
 
+    def _load_flexible(module, pretrained_dict, module_name):
+        model_dict = module.state_dict()
+        filtered_dict = {}
+        for k, v in pretrained_dict.items():
+            if k not in model_dict:
+                logger.info(f'key "{k}" in checkpoint could not be found in {module_name}')
+                continue
+            if v.shape != model_dict[k].shape:
+                logger.info(
+                    f'key "{k}" is of different shape in checkpoint and {module_name}; '
+                    f"checkpoint={tuple(v.shape)} model={tuple(model_dict[k].shape)}"
+                )
+                continue
+            filtered_dict[k] = v
+        msg = module.load_state_dict(filtered_dict, strict=False)
+        return msg
+
     # -- loading encoder
     pretrained_dict = checkpoint["encoder"]
-    msg = encoder.load_state_dict(pretrained_dict)
+    msg = _load_flexible(encoder, pretrained_dict, "encoder")
     logger.info(f"loaded pretrained encoder from epoch {epoch} with msg: {msg}")
 
     # -- loading predictor
     pretrained_dict = checkpoint["predictor"]
-    msg = predictor.load_state_dict(pretrained_dict)
+    msg = _load_flexible(predictor, pretrained_dict, "predictor")
     logger.info(f"loaded pretrained predictor from epoch {epoch} with msg: {msg}")
 
     # -- loading target_encoder
     if target_encoder is not None:
-        print(list(checkpoint.keys()))
         pretrained_dict = checkpoint["target_encoder"]
-        msg = target_encoder.load_state_dict(pretrained_dict)
+        msg = _load_flexible(target_encoder, pretrained_dict, "target_encoder")
         logger.info(f"loaded pretrained target encoder from epoch {epoch} with msg: {msg}")
 
     # -- loading optimizer
-    opt.load_state_dict(checkpoint["opt"])
-    if scaler is not None:
+    try:
+        opt.load_state_dict(checkpoint["opt"])
+    except ValueError:
+        logger.info("[warn] Optimizer groups mismatch; reinitializing optimizer.")
+    if scaler is not None and checkpoint.get("scaler") is not None:
         scaler.load_state_dict(checkpoint["scaler"])
     logger.info(f"loaded optimizers from epoch {epoch}")
     logger.info(f"read-path: {r_path}")

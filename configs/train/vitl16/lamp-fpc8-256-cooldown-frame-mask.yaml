@@ -3,7 +3,7 @@ nodes: 1
 tasks_per_node: 8
 cpus_per_task: 8
 mem_per_gpu: 80G
-folder: /data/chainflow-vla/outputs/vjepa2/lamp-fpc8-256-vitl-newest
+folder: /data/chainflow-vla/outputs/vjepa2/lamp-fpc8-256-vitl-frame-mask-0730
 data:
   dataset_type: VideoDataset
   datasets:
@@ -66,6 +66,22 @@ mask:
   temporal_scale:
   - 1.0
   - 1.0
+- aspect_ratio:
+  - 1.0
+  - 1.0
+  full_complement: false
+  max_keep: null
+  max_temporal_keep: 1.0
+  num_blocks: 1
+  spatial_scale:
+  - 1.0
+  - 1.0
+  temporal_scale:
+  - 1.0
+  - 1.0
+  temporal_frame_mask:
+    enabled: true
+    num_slices: 1
 meta:
   dtype: bfloat16
   eval_freq: 100

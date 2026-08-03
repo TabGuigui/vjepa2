@@ -3,23 +3,20 @@ nodes: 1
 tasks_per_node: 8
 cpus_per_task: 8
 mem_per_gpu: 80G
-folder: /data/chainflow-vla/outputs/vjepa2/lamp-fpc8-256-vitl-newest
+folder: /data/chainflow-vla/outputs/vjepa2/lamp-fpc4-256x512-vitg-lamp-70w+10w
 data:
   dataset_type: VideoDataset
   datasets:
-  - /data/chainflow-vla/navsim_vjepa_fpc8_camf0/train.csv
-  - /data/chainflow-vla/opendv_vjepa_fpc8_camf0/train.csv
-  - /data/chainflow-vla/opendv_vjepa_fpc8_camf0/val.csv
+  - /data/chainflow-vla/navsim_vjepa_fpc4_camf0/train.csv
+  - /data/chainflow-vla/opendv_vjepa_fpc4_camf0/train.csv
   datasets_weights:
-  - 0.1
-  - 0.85
-  - 0.05
+  - 0.5
+  - 0.5
   batch_size: 64
-  crop_size: 256
+  crop_size: [256, 512]
   dataset_fpcs:
-  - 8
-  - 8
-  - 8
+  - 4
+  - 4
   fps: 2
   num_workers: 4
   patch_size: 16
@@ -31,10 +28,10 @@ data_aug:
   motion_shift: false
   random_horizontal_flip: false
   random_resize_aspect_ratio:
-  - 0.75
-  - 1.35
+  - 2.0
+  - 2.0
   random_resize_scale:
-  - 0.3
+  - 1.0
   - 1.0
   reprob: 0.0
 loss:
@@ -71,11 +68,11 @@ meta:
   eval_freq: 100
   load_checkpoint: true
   read_checkpoint: null
-  save_every_freq: 20
+  save_every_freq: 10
   seed: 239
   use_sdpa: true
 model:
-  model_name: vit_large
+  model_name: vit_giant_xformers
   pred_depth: 12
   pred_embed_dim: 384
   pred_num_heads: 12
@@ -85,11 +82,11 @@ model:
   use_rope: true
   zero_init_mask_tokens: true
 optimization:
-  anneal_ckpt: /data/chainflow-vla/vjepa2/ckpts/vjepa2-vitl-fpc64-256/original/model.pth
+  anneal_ckpt: /data/e2e/diffusiondrive/vjepa2/ckpts/vjepa2-vitg-fpc64-256/original/model.pth
   ema:
   - 0.99925
   - 0.99925
-  epochs: 50
+  epochs: 150
   final_lr: 0.000525
   final_weight_decay: 0.04
   ipe: 300

@@ -5,7 +5,7 @@ mem_per_gpu: 80G
 nodes: 1
 max_workers: 8
 resume_checkpoint: true
-tag: navsim-fpc8-last4-vitl-zero
+tag: navsim-fpc8-last4-vitl-navsim
 tasks_per_node: 1
 experiment:
   probe:
@@ -41,7 +41,7 @@ experiment:
       warmup: 0.05
       weight_decay: 0.05
 model_kwargs:
-  checkpoint: /data/chainflow-vla/vjepa2/ckpts/vjepa2-vitl-fpc64-256/original/model.pth
+  checkpoint: /data/chainflow-vla/outputs/vjepa2/navsim-fpc8-256/latest.pt
   module_name: evals.inverse_dynamics_frozen.modelcustom.vit_encoder
   pretrain_kwargs:
     encoder:
