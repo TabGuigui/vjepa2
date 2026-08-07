@@ -1,0 +1,54 @@
+cpus_per_task: 8
+eval_name: depth_estimation_frozen
+folder: /data/chainflow-vla/outputs/vjepa2/evals
+mem_per_gpu: 80G
+nodes: 1
+max_workers: 8
+resume_checkpoint: true
+tag: navsim-depth-vitl-170w-bs32
+tasks_per_node: 1
+experiment:
+  probe:
+    temporal_pool: mean
+    activation: softplus
+  data:
+    dataset_train: /mnt/gxt-share-navsim/dataset/kitti_depth/train.csv
+    dataset_val: /mnt/gxt-share-navsim/dataset/kitti_depth/val.csv
+    frames_per_clip: 4
+    resolution: 256
+    depth_scale: 256.0
+    min_depth: 0.001
+    max_depth: 80.0
+    num_workers: 4
+    pin_memory: true
+  optimization:
+    batch_size: 32
+    num_epochs: 20
+    use_bfloat16: true
+    multihead_kwargs:
+    - final_lr: 0.0
+      final_weight_decay: 0.01
+      lr: 0.001
+      start_lr: 0.001
+      warmup: 0.05
+      weight_decay: 0.01
+    - final_lr: 0.0
+      final_weight_decay: 0.05
+      lr: 0.0003
+      start_lr: 0.0003
+      warmup: 0.05
+      weight_decay: 0.05
+model_kwargs:
+  checkpoint: /data/chainflow-vla/outputs/vjepa2/lamp-fpc8-256-vitl-frame-mask/latest.pt
+  module_name: evals.depth_estimation_frozen.modelcustom.vit_encoder
+  pretrain_kwargs:
+    encoder:
+      checkpoint_key: target_encoder
+      model_name: vit_large_rope
+      patch_size: 16
+      tubelet_size: 2
+      uniform_power: true
+      use_sdpa: true
+      use_silu: false
+      wide_silu: true
+  wrapper_kwargs: {}
